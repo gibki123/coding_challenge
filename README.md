@@ -1,6 +1,6 @@
 # coding_challenge
 ## Chapter_I
-Do uruchomienia nie są potrzebne żadne dodatkowe pakiety.
+Do uruchomienia nie są potrzebne żadne dodatkowe pakiety. Kod główny znajduje się w pliku internship_car.py
 ## Chapter_II
 Do tego zadania została użyta nierelacyjna baza danych "MongoDB" postawiona na darmowym klastrze.
 W celu uruchomienia projektu należy zainstalować dodatkowe biblioteki:
