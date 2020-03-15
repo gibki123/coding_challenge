@@ -21,14 +21,17 @@ db = client.get_database('tasks_db')
 records = db['task_records']
 
 
-def add(task_name, deadline, description):
+def add(task_name, **update_variables):
     hashed_name = hashlib.sha256(str(task_name).encode('utf-8')).hexdigest()
-    new_task = {
-        "name": task_name,
-        "deadline": datetime.datetime.strptime(deadline, "%Y-%m-%d"),
-        "descripition": description,
-        "task_hash": hashed_name
-    }
+    new_task = {"name": task_name}
+
+    for key, value in update_variables.items():
+        if value:
+            if key == 'deadline':
+                new_task['deadline'] = datetime.datetime.strptime(value, "%Y-%m-%d")
+            else:
+                new_task[key] = value
+    new_task['task_hash'] = hashed_name
     records.insert_one(new_task)
 
 
@@ -36,7 +39,11 @@ def update(hashed_name, **update_variables):
     search_query = {"task_hash": hashed_name}
     new_values = {}
     for key, value in update_variables.items():
-        new_values[key] = value
+        if value:
+            if key == 'deadline':
+                new_values['deadline'] = datetime.datetime.strptime(value, "%Y-%m-%d")
+            else:
+                new_values[key] = value
     hashed_name = hashlib.sha256(str(new_values['name']).encode('utf-8')).hexdigest()
     new_values['task_hash'] = hashed_name
     update_query = {"$set": new_values}
@@ -44,7 +51,7 @@ def update(hashed_name, **update_variables):
     if updated_records.matched_count == 0:
         print("No tasks with this hash")
     elif updated_records.modified_count > 0:
-        print("Successfully modified " + updated_records.modified_count + " records")
+        print("Successfully modified " + str(updated_records.modified_count) + " records")
 
 
 def remove(hashed_name):
@@ -61,9 +68,12 @@ def list(listing_argument):
                 print(key, value)
     elif listing_argument == "today":
         db_cursor = records.find()
-        for key, value in db_cursor.next().items():
-            if x.deadline == datetime.date.today():
-                print(key, value)
+        for record in db_cursor:
+            if 'deadline' in record:
+                if str(record['deadline']).split(' ')[0] == str(datetime.date.today()):
+                    print('*'*74)
+                    for key, value in record.items():
+                        print(key, value)
 
 
 if __name__ == "__main__":
@@ -71,7 +81,7 @@ if __name__ == "__main__":
     if action:
         if action == 'add':
             if args.name:
-                add(args.name, args.deadline, args.description)
+                add(args.name, deadline=args.deadline, description=args.description)
             else:
                 raise MissingValueError("Please add name of your tasks")
 

@@ -27,3 +27,4 @@ for i in range(372**2, 809**2 + 1):
     is_valid = True
 
 print(counter)
+# number of valid passwords: 935
