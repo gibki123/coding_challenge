@@ -11,7 +11,7 @@ class Car():
         self._pax_count = pax_count
         self._car_mass = car_mass
         self.gear_count = gear_count
-        self.total_mass = car_mass + 70
+        self.total_mass = car_mass + 70*pax_count
 
     @property
     def car_mass(self):
